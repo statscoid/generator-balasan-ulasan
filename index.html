@@ -36,9 +36,16 @@
     <div class="w-full max-w-4xl bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
         
         <!-- Header -->
-        <div class="text-center mb-8">
+        <div class="text-center mb-6">
             <h1 class="text-2xl md:text-3xl font-bold text-cyan-400">Generator Balasan Ulasan Bisnis</h1>
             <p class="text-gray-400 mt-2">Buat balasan profesional untuk ulasan pelanggan Anda dalam sekejap.</p>
+        </div>
+
+        <!-- API Key Input -->
+        <div class="mb-6">
+            <label for="api-key" class="block mb-2 text-sm font-medium text-gray-300">Langkah 1: Masukkan Google AI API Key Anda</label>
+            <input type="password" id="api-key" class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200 text-gray-200" placeholder="Masukkan API Key Anda di sini">
+            <p class="text-xs text-gray-500 mt-2">Aplikasi ini memerlukan API Key dari Google AI Studio. Anda bisa mendapatkannya secara gratis <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-cyan-400 hover:underline">di sini</a>.</p>
         </div>
 
         <!-- Main Content: Input and Output -->
@@ -46,13 +53,13 @@
 
             <!-- Input Column -->
             <div class="flex-1">
-                <label for="customer-review" class="block mb-2 text-sm font-medium text-gray-300">Langkah 1: Tempel Ulasan Pelanggan</label>
+                <label for="customer-review" class="block mb-2 text-sm font-medium text-gray-300">Langkah 2: Tempel Ulasan Pelanggan</label>
                 <textarea id="customer-review" rows="10" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200 text-gray-200 placeholder-gray-500" placeholder="Contoh: 'Pelayanannya ramah dan kopinya enak sekali! Pasti akan kembali lagi.'"></textarea>
             </div>
 
             <!-- Output Column -->
             <div class="flex-1">
-                <label for="generated-reply" class="block mb-2 text-sm font-medium text-gray-300">Langkah 3: Dapatkan Saran Balasan</label>
+                <label for="generated-reply" class="block mb-2 text-sm font-medium text-gray-300">Langkah 4: Dapatkan Saran Balasan</label>
                 <div class="relative h-full">
                     <textarea id="generated-reply" rows="10" readonly class="w-full h-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-gray-300" placeholder="Hasil balasan akan muncul di sini..."></textarea>
                     <div id="loading-indicator" class="absolute inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center rounded-lg hidden">
@@ -65,7 +72,7 @@
 
         <!-- Controls -->
         <div class="mt-6">
-            <label class="block mb-2 text-sm font-medium text-gray-300 text-center">Langkah 2: Pilih Jenis Balasan</label>
+            <label class="block mb-2 text-sm font-medium text-gray-300 text-center">Langkah 3: Pilih Jenis Balasan</label>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-4">
                 <button id="generate-short" class="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 shadow-lg flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-2" viewBox="0 0 16 16"><path d="M10.5 8a.5.5 0 0 1-.5.5H3a.5.5 0 0 1 0-1h7a.5.5 0 0 1 .5.5zm-2-3a.5.5 0 0 1-.5.5H3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5zm-5 6a.5.5 0 0 1-.5.5H3a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5z"/></svg>
@@ -93,6 +100,7 @@
 
     <script>
         // DOM Element selections
+        const apiKeyInput = document.getElementById('api-key');
         const customerReviewInput = document.getElementById('customer-review');
         const generatedReplyOutput = document.getElementById('generated-reply');
         const generateShortButton = document.getElementById('generate-short');
@@ -104,9 +112,16 @@
 
         // --- Core Function to Generate Reply ---
         async function generateReply(lengthType) {
+            const apiKey = apiKeyInput.value.trim();
             const review = customerReviewInput.value.trim();
+
+            if (!apiKey) {
+                generatedReplyOutput.value = "Kesalahan: Mohon masukkan API Key Google AI Anda pada kolom yang tersedia di Langkah 1.";
+                return;
+            }
+
             if (!review) {
-                generatedReplyOutput.value = "Silakan masukkan ulasan pelanggan terlebih dahulu.";
+                generatedReplyOutput.value = "Silakan masukkan ulasan pelanggan terlebih dahulu di Langkah 2.";
                 return;
             }
 
@@ -127,7 +142,6 @@
                 // Gemini API Call
                 let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
                 const payload = { contents: chatHistory };
-                const apiKey = ""; // API key is handled by the environment
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(apiUrl, {
@@ -137,7 +151,8 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API Error: ${response.statusText}`);
+                    const errorData = await response.json();
+                    throw new Error(`API Error: ${response.status} - ${errorData.error?.message || response.statusText}`);
                 }
 
                 const result = await response.json();
@@ -178,9 +193,8 @@
         function copyToClipboard() {
             if (!generatedReplyOutput.value) return;
 
-            // Use the 'execCommand' method for broader compatibility in iFrames
             generatedReplyOutput.select();
-            generatedReplyOutput.setSelectionRange(0, 99999); // For mobile devices
+            generatedReplyOutput.setSelectionRange(0, 99999); 
             
             try {
                 document.execCommand('copy');
@@ -196,7 +210,6 @@
                 }, 2000);
             }
             
-            // Deselect the text
             window.getSelection().removeAllRanges();
         }
 
