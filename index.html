@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Balasan Ulasan Bisnis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .spinner {
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Custom scrollbar for webkit browsers */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #2d3748; /* bg-gray-800 */
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #4a5568; /* bg-gray-600 */
+            border-radius: 20px;
+            border: 3px solid #2d3748; /* bg-gray-800 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-2xl md:text-3xl font-bold text-cyan-400">Generator Balasan Ulasan Bisnis</h1>
+            <p class="text-gray-400 mt-2">Buat balasan profesional untuk ulasan pelanggan Anda dalam sekejap.</p>
+        </div>
+
+        <!-- Main Content: Input and Output -->
+        <div class="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
+
+            <!-- Input Column -->
+            <div class="flex-1">
+                <label for="customer-review" class="block mb-2 text-sm font-medium text-gray-300">Langkah 1: Tempel Ulasan Pelanggan</label>
+                <textarea id="customer-review" rows="10" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200 text-gray-200 placeholder-gray-500" placeholder="Contoh: 'Pelayanannya ramah dan kopinya enak sekali! Pasti akan kembali lagi.'"></textarea>
+            </div>
+
+            <!-- Output Column -->
+            <div class="flex-1">
+                <label for="generated-reply" class="block mb-2 text-sm font-medium text-gray-300">Langkah 3: Dapatkan Saran Balasan</label>
+                <div class="relative h-full">
+                    <textarea id="generated-reply" rows="10" readonly class="w-full h-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-gray-300" placeholder="Hasil balasan akan muncul di sini..."></textarea>
+                    <div id="loading-indicator" class="absolute inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center rounded-lg hidden">
+                        <div class="spinner w-8 h-8 rounded-full border-4 border-gray-600"></div>
+                        <span class="ml-3 text-gray-300">Membuat balasan...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="mt-6">
+            <label class="block mb-2 text-sm font-medium text-gray-300 text-center">Langkah 2: Pilih Jenis Balasan</label>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-4">
+                <button id="generate-short" class="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 shadow-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-2" viewBox="0 0 16 16"><path d="M10.5 8a.5.5 0 0 1-.5.5H3a.5.5 0 0 1 0-1h7a.5.5 0 0 1 .5.5zm-2-3a.5.5 0 0 1-.5.5H3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5zm-5 6a.5.5 0 0 1-.5.5H3a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5z"/></svg>
+                    Buat Balasan Singkat
+                </button>
+                <button id="generate-detailed" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 shadow-lg flex items-center justify-center">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-2" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+                    Buat Balasan Rinci
+                </button>
+            </div>
+        </div>
+        
+        <!-- Action Buttons for Output -->
+        <div class="mt-6 flex items-center justify-end gap-3">
+             <button id="clear-button" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                Bersihkan
+            </button>
+            <button id="copy-button" disabled class="disabled:opacity-50 disabled:cursor-not-allowed bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="mr-2" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 7a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1h-15A.5.5 0 0 1-1 7z"/></svg>
+                <span id="copy-text">Salin Teks</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // DOM Element selections
+        const customerReviewInput = document.getElementById('customer-review');
+        const generatedReplyOutput = document.getElementById('generated-reply');
+        const generateShortButton = document.getElementById('generate-short');
+        const generateDetailedButton = document.getElementById('generate-detailed');
+        const copyButton = document.getElementById('copy-button');
+        const clearButton = document.getElementById('clear-button');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const copyButtonText = document.getElementById('copy-text');
+
+        // --- Core Function to Generate Reply ---
+        async function generateReply(lengthType) {
+            const review = customerReviewInput.value.trim();
+            if (!review) {
+                generatedReplyOutput.value = "Silakan masukkan ulasan pelanggan terlebih dahulu.";
+                return;
+            }
+
+            // Show loading state
+            loadingIndicator.classList.remove('hidden');
+            setButtonsDisabled(true);
+            generatedReplyOutput.value = '';
+
+            // Construct the prompt for the AI
+            let prompt;
+            if (lengthType === 'short') {
+                prompt = `Anda adalah asisten layanan pelanggan yang ramah dan profesional. Tugas Anda adalah menulis balasan untuk ulasan pelanggan Google Business berikut. Buatlah balasan yang singkat, padat, dan positif dalam bahasa Indonesia, sekitar 1-2 kalimat.\n\nUlasan Pelanggan: "${review}"\n\nBalasan Singkat:`;
+            } else { // 'detailed'
+                prompt = `Anda adalah asisten layanan pelanggan yang ramah, profesional, dan empatik. Tugas Anda adalah menulis balasan untuk ulasan pelanggan Google Business berikut. Buatlah balasan yang lebih rinci dan personal dalam bahasa Indonesia, sekitar 3-4 kalimat. Jika ulasannya positif, ucapkan terima kasih dengan hangat dan sebutkan detail yang mereka sukai. Jika ulasannya negatif, tunjukkan empati, minta maaf atas pengalaman buruknya, dan tawarkan solusi atau ajakan untuk berdiskusi lebih lanjut.\n\nUlasan Pelanggan: "${review}"\n\nBalasan Rinci:`;
+            }
+
+            try {
+                // Gemini API Call
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // API key is handled by the environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const replyText = result.candidates[0].content.parts[0].text;
+                    generatedReplyOutput.value = replyText.trim();
+                    copyButton.disabled = false;
+                } else {
+                    throw new Error("Struktur respons API tidak valid atau balasan kosong.");
+                }
+
+            } catch (error) {
+                console.error("Error:", error);
+                generatedReplyOutput.value = `Maaf, terjadi kesalahan saat membuat balasan. Silakan coba lagi.\n\nDetail: ${error.message}`;
+            } finally {
+                // Hide loading state
+                loadingIndicator.classList.add('hidden');
+                setButtonsDisabled(false);
+            }
+        }
+
+        // --- Helper Functions ---
+        function setButtonsDisabled(disabled) {
+            generateShortButton.disabled = disabled;
+            generateDetailedButton.disabled = disabled;
+            if(disabled) {
+                generateShortButton.classList.add('opacity-50', 'cursor-not-allowed');
+                generateDetailedButton.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                generateShortButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                generateDetailedButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function copyToClipboard() {
+            if (!generatedReplyOutput.value) return;
+
+            // Use the 'execCommand' method for broader compatibility in iFrames
+            generatedReplyOutput.select();
+            generatedReplyOutput.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                document.execCommand('copy');
+                copyButtonText.textContent = 'Tersalin!';
+                setTimeout(() => {
+                    copyButtonText.textContent = 'Salin Teks';
+                }, 2000);
+            } catch (err) {
+                console.error('Gagal menyalin teks: ', err);
+                copyButtonText.textContent = 'Gagal';
+                 setTimeout(() => {
+                    copyButtonText.textContent = 'Salin Teks';
+                }, 2000);
+            }
+            
+            // Deselect the text
+            window.getSelection().removeAllRanges();
+        }
+
+        function clearFields() {
+            customerReviewInput.value = '';
+            generatedReplyOutput.value = '';
+            copyButton.disabled = true;
+            copyButtonText.textContent = 'Salin Teks';
+        }
+
+        // --- Event Listeners ---
+        generateShortButton.addEventListener('click', () => generateReply('short'));
+        generateDetailedButton.addEventListener('click', () => generateReply('detailed'));
+        copyButton.addEventListener('click', copyToClipboard);
+        clearButton.addEventListener('click', clearFields);
+
+    </script>
+</body>
+</html>
