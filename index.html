@@ -33,7 +33,7 @@
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
 
-    <div class="w-full max-w-4xl bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
+    <div class="w-full max-w-6xl bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
         
         <!-- Header -->
         <div class="text-center mb-6">
@@ -48,20 +48,29 @@
             <p class="text-xs text-gray-500 mt-2">Aplikasi ini memerlukan API Key dari Google AI Studio. Anda bisa mendapatkannya secara gratis <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-cyan-400 hover:underline">di sini</a>.</p>
         </div>
 
-        <!-- Main Content: Input and Output -->
-        <div class="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
+        <!-- Main Content: Inputs and Output -->
+        <div class="flex flex-col lg:flex-row lg:space-x-6 space-y-6 lg:space-y-0">
 
-            <!-- Input Column -->
-            <div class="flex-1">
-                <label for="customer-review" class="block mb-2 text-sm font-medium text-gray-300">Langkah 2: Tempel Ulasan Pelanggan</label>
-                <textarea id="customer-review" rows="10" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200 text-gray-200 placeholder-gray-500" placeholder="Contoh: 'Pelayanannya ramah dan kopinya enak sekali! Pasti akan kembali lagi.'"></textarea>
+            <!-- Left Column: Inputs -->
+            <div class="lg:w-1/2 flex flex-col space-y-6">
+                <!-- Knowledge Input -->
+                <div>
+                    <label for="knowledge-input" class="block mb-2 text-sm font-medium text-gray-300">Langkah 2: Pengetahuan Bisnis (Opsional)</label>
+                    <textarea id="knowledge-input" rows="5" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200 text-gray-200 placeholder-gray-500" placeholder="Contoh: Nama bisnis kami adalah Kopi Senja. Kami ada promo Beli 1 Gratis 1 setiap hari Jumat. Jam buka 08:00 - 22:00."></textarea>
+                </div>
+
+                <!-- Customer Review Input -->
+                <div>
+                    <label for="customer-review" class="block mb-2 text-sm font-medium text-gray-300">Langkah 3: Tempel Ulasan Pelanggan</label>
+                    <textarea id="customer-review" rows="8" class="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200 text-gray-200 placeholder-gray-500" placeholder="Contoh: 'Pelayanannya ramah dan kopinya enak sekali! Pasti akan kembali lagi.'"></textarea>
+                </div>
             </div>
 
-            <!-- Output Column -->
-            <div class="flex-1">
-                <label for="generated-reply" class="block mb-2 text-sm font-medium text-gray-300">Langkah 4: Dapatkan Saran Balasan</label>
-                <div class="relative h-full">
-                    <textarea id="generated-reply" rows="10" readonly class="w-full h-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-gray-300" placeholder="Hasil balasan akan muncul di sini..."></textarea>
+            <!-- Right Column: Output -->
+            <div class="lg:w-1/2 flex flex-col">
+                <label for="generated-reply" class="block mb-2 text-sm font-medium text-gray-300">Langkah 5: Dapatkan Saran Balasan</label>
+                <div class="relative flex-grow">
+                    <textarea id="generated-reply" readonly class="w-full h-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-gray-300" placeholder="Hasil balasan akan muncul di sini..."></textarea>
                     <div id="loading-indicator" class="absolute inset-0 bg-gray-900 bg-opacity-80 flex items-center justify-center rounded-lg hidden">
                         <div class="spinner w-8 h-8 rounded-full border-4 border-gray-600"></div>
                         <span class="ml-3 text-gray-300">Membuat balasan...</span>
@@ -72,7 +81,7 @@
 
         <!-- Controls -->
         <div class="mt-6">
-            <label class="block mb-2 text-sm font-medium text-gray-300 text-center">Langkah 3: Pilih Jenis Balasan</label>
+            <label class="block mb-2 text-sm font-medium text-gray-300 text-center">Langkah 4: Pilih Jenis Balasan</label>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-4">
                 <button id="generate-short" class="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 shadow-lg flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-2" viewBox="0 0 16 16"><path d="M10.5 8a.5.5 0 0 1-.5.5H3a.5.5 0 0 1 0-1h7a.5.5 0 0 1 .5.5zm-2-3a.5.5 0 0 1-.5.5H3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5zm-5 6a.5.5 0 0 1-.5.5H3a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5z"/></svg>
@@ -101,6 +110,7 @@
     <script>
         // DOM Element selections
         const apiKeyInput = document.getElementById('api-key');
+        const knowledgeInput = document.getElementById('knowledge-input'); // New
         const customerReviewInput = document.getElementById('customer-review');
         const generatedReplyOutput = document.getElementById('generated-reply');
         const generateShortButton = document.getElementById('generate-short');
@@ -113,6 +123,7 @@
         // --- Core Function to Generate Reply ---
         async function generateReply(lengthType) {
             const apiKey = apiKeyInput.value.trim();
+            const knowledge = knowledgeInput.value.trim(); // New
             const review = customerReviewInput.value.trim();
 
             if (!apiKey) {
@@ -121,7 +132,7 @@
             }
 
             if (!review) {
-                generatedReplyOutput.value = "Silakan masukkan ulasan pelanggan terlebih dahulu di Langkah 2.";
+                generatedReplyOutput.value = "Silakan masukkan ulasan pelanggan terlebih dahulu di Langkah 3.";
                 return;
             }
 
@@ -130,12 +141,18 @@
             setButtonsDisabled(true);
             generatedReplyOutput.value = '';
 
-            // Construct the prompt for the AI
+            // Construct the knowledge text to be added to the prompt
+            let knowledgeText = '';
+            if (knowledge) {
+                knowledgeText = `Gunakan informasi tambahan tentang bisnis berikut untuk membuat balasan yang lebih personal dan akurat:\n"""\n${knowledge}\n"""\n\n`;
+            }
+
+            // Construct the main prompt
             let prompt;
             if (lengthType === 'short') {
-                prompt = `Anda adalah asisten layanan pelanggan yang ramah dan profesional. Tugas Anda adalah menulis balasan untuk ulasan pelanggan Google Business berikut. Buatlah balasan yang singkat, padat, dan positif dalam bahasa Indonesia, sekitar 1-2 kalimat.\n\nUlasan Pelanggan: "${review}"\n\nBalasan Singkat:`;
+                prompt = `Anda adalah asisten layanan pelanggan yang ramah dan profesional. Tugas Anda adalah menulis balasan untuk ulasan pelanggan Google Business berikut. ${knowledgeText}Buatlah balasan yang singkat, padat, dan positif dalam bahasa Indonesia, sekitar 1-2 kalimat.\n\nUlasan Pelanggan: "${review}"\n\nBalasan Singkat:`;
             } else { // 'detailed'
-                prompt = `Anda adalah asisten layanan pelanggan yang ramah, profesional, dan empatik. Tugas Anda adalah menulis balasan untuk ulasan pelanggan Google Business berikut. Buatlah balasan yang lebih rinci dan personal dalam bahasa Indonesia, sekitar 3-4 kalimat. Jika ulasannya positif, ucapkan terima kasih dengan hangat dan sebutkan detail yang mereka sukai. Jika ulasannya negatif, tunjukkan empati, minta maaf atas pengalaman buruknya, dan tawarkan solusi atau ajakan untuk berdiskusi lebih lanjut.\n\nUlasan Pelanggan: "${review}"\n\nBalasan Rinci:`;
+                prompt = `Anda adalah asisten layanan pelanggan yang ramah, profesional, dan empatik. Tugas Anda adalah menulis balasan untuk ulasan pelanggan Google Business berikut. ${knowledgeText}Jika ulasannya positif, ucapkan terima kasih dengan hangat dan sebutkan detail yang mereka sukai. Jika ulasannya negatif, tunjukkan empati, minta maaf atas pengalaman buruknya, dan tawarkan solusi atau ajakan untuk berdiskusi lebih lanjut. Buat balasan sekitar 3-4 kalimat dalam bahasa Indonesia.\n\nUlasan Pelanggan: "${review}"\n\nBalasan Rinci:`;
             }
 
             try {
@@ -216,6 +233,7 @@
         function clearFields() {
             customerReviewInput.value = '';
             generatedReplyOutput.value = '';
+            knowledgeInput.value = ''; // Clear knowledge field too
             copyButton.disabled = true;
             copyButtonText.textContent = 'Salin Teks';
         }
